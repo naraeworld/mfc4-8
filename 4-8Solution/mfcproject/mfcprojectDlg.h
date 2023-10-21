@@ -19,6 +19,7 @@ public:
 	CDlgImage *m_pDlgImageResult;
 
 
+
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MFCPROJECT_DIALOG };
@@ -41,7 +42,11 @@ protected:
 public:
 	afx_msg void OnEnChangeEdit();
 	afx_msg void OnBnClickedCancel();
-	afx_msg void OnBnClickedBntTest();
+	afx_msg
+		void ClearImageDialog(CDialog * pDialog);
+	void OnBnClickedBntTest();
+	void OnDestroy();
 	int m_nNum;
+
 	CEdit m_Radius;
 };

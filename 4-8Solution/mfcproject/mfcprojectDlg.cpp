@@ -17,11 +17,13 @@
 
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
+using namespace std;
 
 class CAboutDlg : public CDialogEx
 {
 public:
 	CAboutDlg();
+
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -34,6 +36,8 @@ public:
 // 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	/*afx_msg void OnDestroy();*/
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -46,6 +50,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -78,6 +83,15 @@ END_MESSAGE_MAP()
 
 
 // CmfcprojectDlg 메시지 처리기
+
+
+//void CmfcprojectDlg::OnDestroy()
+//{
+//	CDialogEx::OnDestroy();
+//
+//	if (m_pDlgImage) delete m_pDlgImage;
+//	if (m_pDlgImageResult) delete m_pDlgImageResult;
+//}
 
 BOOL CmfcprojectDlg::OnInitDialog()
 {
@@ -190,14 +204,27 @@ void CmfcprojectDlg::OnBnClickedCancel()
 }
 
 
+void CmfcprojectDlg::ClearImageDialog(CDialog* pDialog)
+{
+	CRect clientRect;
+	pDialog->GetClientRect(clientRect);
+	CClientDC dc(pDialog);
+	dc.FillSolidRect(clientRect, GetSysColor(COLOR_WINDOW));
+}
+
 void CmfcprojectDlg::OnBnClickedBntTest()
 {
 
 	if (m_pDlgImage) {
 
+		// 이미지 초기화
+		ClearImageDialog(m_pDlgImage);
+
 		CClientDC dc(this);
-		int centerX = 100;
-		int centerY = 100;
+
+		int nWidth = m_pDlgImage->m_image.GetWidth();
+		int nHeight = m_pDlgImage->m_image.GetHeight();
+		int nPitch = m_pDlgImage->m_image.GetPitch();
 
 		int radius;
 		CString radiusStr;
@@ -206,24 +233,51 @@ void CmfcprojectDlg::OnBnClickedBntTest()
 		// CString을 정수로 변환
 		radius = _tstoi(radiusStr);
 
+		// 새로운 중심 좌표 계산
+		srand(time(NULL));  // 난수 시드 설정
+		int centerX = rand() % (nWidth - 2 * radius) + radius;
+		int centerY = rand() % (nHeight - 2 * radius) + radius;
+
+		// 무게 중심 계산
+		unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+		int nTh = 0x80;
+		int nSumX = 0;
+		int nSumY = 0;
+		int nCount = 0;
+
+		for (int j = centerY - radius; j < centerY + radius; j++) {
+			for (int i = centerX - radius; i < centerX + radius; i++) {
+				if (i >= 0 && i < nWidth && j >= 0 && j < nHeight && fm[j * nPitch + i] > nTh) {
+					nSumX += i;
+					nSumY += j;
+					nCount++;
+				}
+			}
+		}
+
+		double dCenterX = (double)nSumX / nCount;
+		double dCenterY = (double)nSumY / nCount;
+
+		// 원 그리기
 		m_pDlgImage->drawData(&dc, centerX, centerY, radius);
+
+		// 빨간색 십자가 그리기
+		CPen pen;
+		pen.CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+		CPen* pOldPen = dc.SelectObject(&pen);
+
+		// 가로선 그리기
+		dc.MoveTo(dCenterX - 10, dCenterY);
+		dc.LineTo(dCenterX + 10, dCenterY);
+
+		// 세로선 그리기
+		dc.MoveTo(dCenterX, dCenterY - 10);
+		dc.LineTo(dCenterX, dCenterY + 10);
+
+		dc.SelectObject(pOldPen);
+
+		cout << "원의 무게 중심:" << dCenterX << ", " << dCenterY << endl;
 	}
 }
-	
-	
 
-
-	//unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-	//int nWidth = m_pDlgImage->m_image.GetWidth();
-	//int nHeight = m_pDlgImage->m_image.GetHeight();
-	//int nPitch = m_pDlgImage->m_image.GetPitch();
-
-
-	//for (int k = 0; k < 100; k++) {
-	//	int x = rand() % nWidth;
-	//	int y = rand() % nHeight;
-	//	fm[y*nPitch + x] = 0;
-
-
-	//m_pDlgImage->Invalidate();
 

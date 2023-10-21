@@ -66,7 +66,7 @@ void CDlgImage::OnPaint()
 void CDlgImage::drawData(CDC* pDC, int centerX, int centerY, int radius) {
 
 	CPen pen(PS_SOLID, 2, RGB(255, 255, 0)); // 노란색 테두리 펜 생성
-	CBrush brush(RGB(255, 0, 0)); // 빨간색 채우기 브러시 생성
+	CBrush brush(GetSysColor(COLOR_WINDOW)); // 빨간색 채우기 브러시 생성
 	CPen* pOldPen = pDC->SelectObject(&pen);
 	CBrush* pOldBrush = pDC->SelectObject(&brush);
 

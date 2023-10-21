@@ -6,6 +6,7 @@
 #include "mfcproject.h"
 #include "mfcprojectDlg.h"
 #include "afxdialogex.h"
+#include "DlgImage.h"
 #include <iostream>
 
 #ifdef _DEBUG
@@ -54,6 +55,7 @@ END_MESSAGE_MAP()
 
 CmfcprojectDlg::CmfcprojectDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_MFCPROJECT_DIALOG, pParent)
+	, m_nNum(10)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,6 +63,8 @@ CmfcprojectDlg::CmfcprojectDlg(CWnd* pParent /*=NULL*/)
 void CmfcprojectDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT, m_nNum);
+	DDX_Control(pDX, IDC_EDIT, m_Radius);
 }
 
 BEGIN_MESSAGE_MAP(CmfcprojectDlg, CDialogEx)
@@ -159,7 +163,10 @@ void CmfcprojectDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 	}
+
+	CDC*pDC = GetDC();
 }
+
 
 // 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
 //  이 함수를 호출합니다.
@@ -172,15 +179,7 @@ HCURSOR CmfcprojectDlg::OnQueryDragIcon()
 
 void CmfcprojectDlg::OnEnChangeEdit()
 {
-	// TODO:  RICHEDIT 컨트롤인 경우, 이 컨트롤은
-	// CDialogEx::OnInitDialog() 함수를 재지정 
-	//하고 마스크에 OR 연산하여 설정된 ENM_CHANGE 플래그를 지정하여 CRichEditCtrl().SetEventMask()를 호출하지 않으면
-	// 이 알림 메시지를 보내지 않습니다.
-
-	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
-
-
-
+	UpdateData(TRUE); // Edit Control에서 데이터를 읽어옴
 }
 
 
@@ -193,18 +192,38 @@ void CmfcprojectDlg::OnBnClickedCancel()
 
 void CmfcprojectDlg::OnBnClickedBntTest()
 {
-	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-	int nWidth = m_pDlgImage->m_image.GetWidth();
-	int nHeight = m_pDlgImage->m_image.GetHeight();
-	int nPitch = m_pDlgImage->m_image.GetPitch();
 
-	for (int k = 0; k < 100; k++) {
-		int x = rand() % nWidth;
-		int y = rand() % nHeight;
-		fm[y*nPitch + x] = 0;
+	if (m_pDlgImage) {
 
+		CClientDC dc(this);
+		int centerX = 100;
+		int centerY = 100;
+
+		int radius;
+		CString radiusStr;
+		// Edit Control의 텍스트를 얻어옴
+		m_Radius.GetWindowText(radiusStr);
+		// CString을 정수로 변환
+		radius = _tstoi(radiusStr);
+
+		m_pDlgImage->drawData(&dc, centerX, centerY, radius);
 	}
-
-
-	m_pDlgImage->Invalidate();
 }
+	
+	
+
+
+	//unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	//int nWidth = m_pDlgImage->m_image.GetWidth();
+	//int nHeight = m_pDlgImage->m_image.GetHeight();
+	//int nPitch = m_pDlgImage->m_image.GetPitch();
+
+
+	//for (int k = 0; k < 100; k++) {
+	//	int x = rand() % nWidth;
+	//	int y = rand() % nHeight;
+	//	fm[y*nPitch + x] = 0;
+
+
+	//m_pDlgImage->Invalidate();
+

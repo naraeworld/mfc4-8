@@ -57,9 +57,26 @@ void CDlgImage::OnPaint()
 					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
 					   // 그리기 메시지에 대해서는 CDialogEx::OnPaint()을(를) 호출하지 마십시오.
 
-	if (m_image) {
+	/*if (m_image) {
 		m_image.Draw(dc, 0, 0);
 	}
+*/
+}
+
+void CDlgImage::drawData(CDC* pDC, int centerX, int centerY, int radius) {
+
+	CPen pen(PS_SOLID, 2, RGB(255, 255, 0)); // 노란색 테두리 펜 생성
+	CBrush brush(RGB(255, 0, 0)); // 빨간색 채우기 브러시 생성
+	CPen* pOldPen = pDC->SelectObject(&pen);
+	CBrush* pOldBrush = pDC->SelectObject(&brush);
+
+
+	CRect rect(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+	pDC->Ellipse(&rect);
+
+	pDC->SelectObject(pOldPen);
+	pDC->SelectObject(pOldBrush);
+
 
 }
 

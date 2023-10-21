@@ -13,6 +13,8 @@ public:
 
 	CImage m_image;
 
+	void drawData(CDC* pDC, int centerX, int centerY, int radius); // 원을 그리는 함수
+
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -27,8 +29,10 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 
-	void InitImage();
+	
+
 
 private:
-	
+	void InitImage();
+	int m_Radius;
 };
